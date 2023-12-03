@@ -1,6 +1,15 @@
 #include <stdio.h>
+#include <string.h>
+
+void replace(char * text, char * new) {
+    printf("%lu", sizeof(text));
+    printf("%lu", strlen(text));
+    str
+    printf("%lu", sizeof(new));
+    printf("%s", new);
+}
 
 int main() {
-    char some = '5';
-    printf("%d", some > '3');
+    char text[5] = "hallo";
+    replace("hallo", "some");
 }
