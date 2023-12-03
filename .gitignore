@@ -3,3 +3,5 @@
 
 # but gitignore should not be ignored
 !.gitignore
+
+test.c
