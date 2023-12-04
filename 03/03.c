@@ -18,7 +18,7 @@ bool isSymbol(char character) {
     return (character < '0' || character > '9') && character != '.';
 }
 
-int readNum(char** cubicle, int row, int col, int* continueIndex) {
+int readNum(char cubicle[140][142], int row, int col, int* continueIndex) {
     int num = 0;
     bool shouldCount = false;
     int numberPow = 0;
@@ -49,7 +49,7 @@ int readNum(char** cubicle, int row, int col, int* continueIndex) {
 
 int main() {
     //von 1 - 140
-    char** cubicle;
+    char cubicle[140][142];
     FILE *filePointer;
     filePointer = fopen("adventofcode.com_2023_day_3_input.txt", "r"); 
     if (filePointer == NULL) {
@@ -58,11 +58,12 @@ int main() {
 
     //read input
     for (int i = 0; i < 140; i++) {
-        fgets(cubicle[i], 140, filePointer);
+        fgets(cubicle[i], 142, filePointer);
     }
 
     int sum = 0;
     for (int row = 0; row < 140; row++) {
+        int lol = sum;
         int col = 139;
         while(col >= 0) {
             if (cubicle[row][col] >= '0' && cubicle[row][col] <= '9') {
@@ -72,6 +73,8 @@ int main() {
                 col--;
             }
         }
+        printf("%s", cubicle[row]);
+        printf("%d\n", sum - lol);
     }
     printf("sum = %d\n", sum);
 }
