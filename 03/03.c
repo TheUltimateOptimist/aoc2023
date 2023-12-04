@@ -14,79 +14,64 @@ int power(int base, int exp) {
     return result;
 }
 
-int getNumberCount(char* line) {
-    int numberCount = 0;
-    bool countsAsNew = true;
-    for (int i = 0; i < sizeof(line); i++) {
-        if (line[i] >= '0' && line[i] <= '9') {
-            if (countsAsNew) {
-                numberCount++;
-                countsAsNew = false;
-            }
-        }
-        else {
-            countsAsNew = true;
-        }
-    }
+bool isSymbol(char character) {
+    return (character < '0' || character > '9') && character != '.';
 }
 
-void fillWithNumbers(char* line, int* numbers) {
-    int numberIndex = 0;
+int readNum(char** cubicle, int row, int col, int* continueIndex) {
+    int num = 0;
+    bool shouldCount = false;
     int numberPow = 0;
-    int number = 0;
-    for (int i = sizeof(line) - 1; i >= 0; i--) {
-        if (line[i] >= '0' && line[i] <= '9') {
-            number = number + (line[i] - 48)*power(10, numberPow);
-            numberPow++;
+    while(col >= 0 && cubicle[row][col] >= '0' && cubicle[row][col] <= '9') {
+        bool left = col > 0 && isSymbol(cubicle[row][col - 1]);
+        bool right = col < 140 - 1 && isSymbol(cubicle[row][col + 1]);
+        bool top = row > 0 && isSymbol(cubicle[row - 1][col]);
+        bool bottom = row < 140 - 1 && isSymbol(cubicle[row + 1][col]);
+        bool topLeft = row > 0 && col > 0 && isSymbol(cubicle[row - 1][col - 1]);
+        bool topRight = row > 0 && col < 140 - 1 && isSymbol(cubicle[row - 1][col + 1]);
+        bool bottomLeft = row < 140 - 1 && col > 0 && isSymbol(cubicle[row + 1][col - 1]);
+        bool bottomRight = row < 140 - 1 && col < 140 - 1 && isSymbol(cubicle[row + 1][col + 1]); 
+        if (left || right || top || bottom || topLeft || topRight || bottomLeft || bottomRight) {
+            shouldCount = true;
         }
-        else if (number != 0 || numberPow != 0){
-            int base = numberIndex*3;
-            numbers[base] = number;
-            numbers[base + 1] = i + 1;
-            numbers[base + 2] = i + numberPow;
-            numberIndex++;
-            numberPow = 0;
-            number = 0;
-        }
+        num = num + (cubicle[row][col] - 48)*power(10, numberPow);
+        col--;
+        numberPow++;
     }
-    if (number != 0 || numberPow != 0) {
-        int base = numberIndex*3;
-        numbers[base] = number;
-        numbers[base + 1] = 0;
-        numbers[base + 2] = numberPow - 1;
+    *continueIndex = col;
+    if (shouldCount) {
+        return num;
+    }
+    else {
+        return 0;
     }
 }
 
 int main() {
-    //char line[] = "....401.............425.......323......791......697...............963............................................420........................\n";
     //von 1 - 140
-    char cubicle[140][140];
+    char** cubicle;
     FILE *filePointer;
     filePointer = fopen("adventofcode.com_2023_day_3_input.txt", "r"); 
     if (filePointer == NULL) {
         printf("error opening the file!");
     }
 
+    //read input
     for (int i = 0; i < 140; i++) {
         fgets(cubicle[i], 140, filePointer);
     }
 
     int sum = 0;
-    for (int i = 0; i < 140; i++) {
-        int numberCount = getNumberCount(cubicle[i]);
-        int numbers[numberCount*3];
-        fillWithNumbers(cubicle[i], numbers);
-        for (int j = 0; j < sizeof(numbers) / sizeof(int); j+=3) {
-            int left = numbers[j + 1] > 0 && cubicle[i][numbers[j + 1] - 1] != '.';
-            if ()
+    for (int row = 0; row < 140; row++) {
+        int col = 139;
+        while(col >= 0) {
+            if (cubicle[row][col] >= '0' && cubicle[row][col] <= '9') {
+                sum += readNum(cubicle, row, col, &col);
+            }
+            else {
+                col--;
+            }
         }
-        if (i > 0) {
-        }
-        if (i == )
-        fgets(i % 2 == 0 ? lineOne : lineTwo, 140, filePointer);
-        int numbersCount = 
-
-
     }
-
+    printf("sum = %d\n", sum);
 }
