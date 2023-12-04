@@ -23,22 +23,14 @@ bool isNumber(char character) {
 }
 
 int readNum(char cubicle[140][142], int row, int col) {
-    int num = 0;
-    int numberPow = 0;
     //go as far to the right as possible
     while(col < 140 - 1 && isNumber(cubicle[row][col + 1])) {
         col++;
     }
 
+    int num = 0;
+    int numberPow = 0;
     while(col >= 0 && isNumber(cubicle[row][col])) {
-        //bool left = col > 0 && isSymbol(cubicle[row][col - 1]);
-        //bool right = col < 140 - 1 && isSymbol(cubicle[row][col + 1]);
-        //bool top = row > 0 && isSymbol(cubicle[row - 1][col]);
-        //bool bottom = row < 140 - 1 && isSymbol(cubicle[row + 1][col]);
-        //bool topLeft = row > 0 && col > 0 && isSymbol(cubicle[row - 1][col - 1]);
-        //bool topRight = row > 0 && col < 140 - 1 && isSymbol(cubicle[row - 1][col + 1]);
-        //bool bottomLeft = row < 140 - 1 && col > 0 && isSymbol(cubicle[row + 1][col - 1]);
-        //bool bottomRight = row < 140 - 1 && col < 140 - 1 && isSymbol(cubicle[row + 1][col + 1]); 
         num = num + (cubicle[row][col] - 48)*power(10, numberPow);
         cubicle[row][col] = '.';
         col--;
@@ -76,25 +68,43 @@ int main() {
                 int nums[8];
                 initWith0(nums);
                 if (col > 0 && isNumber(cubicle[row][col - 1])) {
-                    nums[0] = cubicle[row][col - 1];
+                    nums[0] = readNum(cubicle, row, col - 1); //left
                 }
-                else {
-
+                if (col < 140 - 1 && isNumber(cubicle[row][col + 1])) {
+                    nums[1] = readNum(cubicle, row, col + 1); //right
                 }
-        //bool right = col < 140 - 1 && isSymbol(cubicle[row][col + 1]);
-        //bool top = row > 0 && isSymbol(cubicle[row - 1][col]);
-        //bool bottom = row < 140 - 1 && isSymbol(cubicle[row + 1][col]);
-        //bool topLeft = row > 0 && col > 0 && isSymbol(cubicle[row - 1][col - 1]);
-        //bool topRight = row > 0 && col < 140 - 1 && isSymbol(cubicle[row - 1][col + 1]);
-        //bool bottomLeft = row < 140 - 1 && col > 0 && isSymbol(cubicle[row + 1][col - 1]);
-        //bool bottomRight = row < 140 - 1 && col < 140 - 1 && isSymbol(cubicle[row + 1][col + 1]); 
-
-                
+                if (row > 0 && isSymbol(cubicle[row - 1][col])) {
+                    nums[2] = readNum(cubicle, row - 1, col); //top
+                }
+                if (row < 140 - 1 && isNumber(cubicle[row + 1][col])) {
+                    nums[3] = readNum(cubicle, row + 1, col); //bottom
+                }
+                if (row > 0 && col > 0 && isNumber(cubicle[row - 1][col - 1])) {
+                    nums[4] = readNum(cubicle, row - 1, col - 1); //topLeft
+                }
+                if (row > 0 && col < 140 - 1 && isNumber(cubicle[row - 1][col + 1])) {
+                    nums[5] = readNum(cubicle, row - 1, col + 1); //topRight
+                }
+                if (row < 140 - 1 && col > 0 && isNumber(cubicle[row + 1][col - 1])) {
+                    nums[6] = readNum(cubicle, row + 1, col - 1); //bottomLeft
+                }
+                if (row < 140 - 1 && col < 140 - 1 && isNumber(cubicle[row + 1][col + 1])) {
+                    nums[7] = readNum(cubicle, row + 1, col + 1); //bottomRight
+                }
+                int numberCount = 0;
+                int gearRatio = 1;
+                for (int i = 0; i < 8; i++) {
+                    if (nums[i] != 0) {
+                        gearRatio *= nums[i];
+                        numberCount++;
+                    }
+                }
+                if (numberCount == 2) {
+                    sum += gearRatio;
+                }
             }
             col--;
         }
-        printf("%s", cubicle[row]);
-        printf("%d\n", sum - lol);
     }
     printf("sum = %d\n", sum);
 }
