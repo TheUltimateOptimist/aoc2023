@@ -51,7 +51,7 @@ static void _fillWithParts(char *input, char *substring, char **parts);
 struct stringarray {
     char **end;
     struct string (*join)(char*);
-    long* (*collectLong)();
+    long* (*collectLong)(int* length);
 };
 int strarraylen(char **stringArray);
 void strarrayfree(char **stringArray);
@@ -59,8 +59,8 @@ static struct stringarray _createStringArray(char **input);
 
 char* join(char **input, char *by);
 static struct string _join(char *by);
-long* collectLong(char **input);
-long* _collectLong();
+long* collectLong(char **input, int *length);
+long* _collectLong(int *length);
 
 
 
@@ -456,7 +456,7 @@ static struct string _join(char *by) {
     return _createString(res);
 }
 
-long* collectLong(char **input) {
+long* collectLong(char **input, int *length) {
     int inputLength = strarraylen(input);
     int numberCount = 0;
     for (int i = 0; i < inputLength; i++) {
@@ -465,6 +465,9 @@ long* collectLong(char **input) {
         }
     }
     long *numberList = malloc(numberCount*sizeof(long));
+    if (length != NULL) {
+        *length = numberCount;
+    }
     numberCount = 0;
     char *end;
     for (int i = 0; i < inputLength; i++) {
@@ -476,8 +479,8 @@ long* collectLong(char **input) {
     return numberList;
 }
 
-long* _collectLong() {
-    long *res = collectLong(global);
+long* _collectLong(int *length) {
+    long *res = collectLong(global, length);
     _replaceGlobalStringArray(res);
     return res;
 }
