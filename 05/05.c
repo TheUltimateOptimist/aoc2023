@@ -1,32 +1,42 @@
 #include <stdio.h>
 #include <stdbool.h>
-#include "../aoc.c"
+#include <stdlib.h>
+#include "../string.c"
+#include "../output.c"
+
+#define SEEDS_COUNT 20
+#define MAPS_COUNT 7
+
+int shouldRemove(char a) {
+    return (a < '0' || a > '9') && a != ' ' && a != '\n';
+}
 
 int main() {
-    FILE *filePointer;
-    filePointer = fopen("adventofcode.com_2023_day_5_input.txt", "r");
-    if (filePointer == NULL) {
-        printf("error opening the file!");
-        return 1;
+    char **blocks = readFile("adventofcode.com_2023_day_5_input.txt").split("\n\n").end;
+    //char **blocks = readFile("test.txt").split("\n\n").end;
+    long *seeds = chain(blocks[0]).removeWhen(shouldRemove).split(" ").collectLong(NULL);
+    for (int i = 1; i <= MAPS_COUNT; i++) {
+        int numberCount; 
+        long *numbers = chain(blocks[i]).removeWhen(shouldRemove).replace("\n", " ").split(" ").collectLong(&numberCount);
+        for (int s = 0; s < SEEDS_COUNT; s++) {
+            for (int j = 0; j < numberCount; j+=3) {
+                long sourceStart = numbers[j + 1];
+                long sourceEnd = sourceStart + numbers[j + 2] - 1;
+                //printf("start: %ld end: %ld number: %ld", sourceStart, sourceEnd, seeds[s]);
+                if (seeds[s] >= sourceStart && seeds[s] <= sourceEnd) {
+                    long destStart = numbers[j];
+                    seeds[s] = destStart + seeds[s] - sourceStart;
+                    break;
+                }
+            }
+        }
+        printLongs(seeds, SEEDS_COUNT);
     }
-
-    char line[212];
-    fgets(line, 212, filePointer);
-
-    long seeds[20];
-    extractNumbers(line, seeds, 20);
-
-    jumpLines(filePointer, 2);
-    long numbers[3];
-    fgets(line, 212, filePointer);
-    extractNumbers(line, numbers, 3);
-
-    printLongs(seeds, 20);
-    printLongs(numbers, 3);
-
-    for (int i = 0; i < 7; i++) {
-
+    long min = seeds[0];
+    for (int i = 1; i < SEEDS_COUNT; i++) {
+        if (seeds[i] < min) {
+            min = seeds[i];
+        }
     }
-
-    //printNumbers(seeds, 20);
+    printf("minimum = %ld\n", min);
 }
