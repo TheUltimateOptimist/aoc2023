@@ -16,6 +16,7 @@ struct string {
     int (*isEmptyW)();
     struct string (*substr)(long from, long to);
     int (*substrCount)(char *substr);
+    struct string (*replace)(char *substr, char *with);
     struct string (*removeWhen)(int(*removePredicate)(char a));
     struct string (*trimLeft)();
     struct string (*trimRight)();
@@ -33,6 +34,8 @@ char* substr(char *input, long from, long to);
 static struct string _substr(long from, long to);
 int substrCount(char *input, char *substr);
 static int _substrCount(char *substr);
+char* replace(char *input, char *substr, char *with);
+struct string _replace(char *substr, char *with);
 char* removeWhen(char *input, int(*removePredicate)(char a));
 static struct string _removeWhen(int(*removePredicate)(char a));
 char* trimLeft(char *input);
@@ -139,6 +142,7 @@ static struct string _createString(char *input) {
         _isEmptyW,
         _substr,
         _substrCount,
+        _replace,
         _removeWhen,
         _trimLeft,
         _trimRight,
@@ -237,6 +241,22 @@ static int _substrCount(char *substr) {
     int res = substrCount(global, substr);
     _replaceGlobalString(&res);
     return res;
+}
+
+char* replace(char *input, char *substr, char *with) {
+    if (isEmpty(substr)) {
+        return input;
+    }
+    char **parts = split(input, substr);
+    char *res = join(parts, with);
+    strarrayfree(parts);
+    return res;
+}
+
+struct string _replace(char *substr, char *with) {
+    char *res = replace(global, substr, with);
+    _replaceGlobalString(res);
+    return _createString(res);
 }
 
 /// @brief creates a new string with every character for which removePredicate returns 1 removed
