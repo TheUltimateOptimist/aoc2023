@@ -17,6 +17,8 @@ struct string {
     int (*isEmptyW)();
     struct string (*substr)(long from, long to);
     int (*substrCount)(char *substr);
+    int (*startsWith)(char *with);
+    int (*endsWith)(char *with);
     struct string (*replace)(char *substr, char *with);
     struct string (*removeWhen)(int(*removePredicate)(char a));
     struct string (*trimLeft)();
@@ -38,6 +40,10 @@ char* substr(char *input, long from, long to);
 static struct string _substr(long from, long to);
 int substrCount(char *input, char *substr);
 static int _substrCount(char *substr);
+int startsWith(char *input, char *with);
+static int _startsWith(char *with);
+int endsWith(char *input, char *with);
+static int _endsWith(char *with);
 char* replace(char *input, char *substr, char *with);
 struct string _replace(char *substr, char *with);
 char* removeWhen(char *input, int(*removePredicate)(char a));
@@ -152,6 +158,8 @@ static struct string _createString(char *input) {
         _isEmptyW,
         _substr,
         _substrCount,
+        _startsWith,
+        _endsWith,
         _replace,
         _removeWhen,
         _trimLeft,
@@ -252,6 +260,46 @@ int substrCount(char *input, char *substr) {
 
 static int _substrCount(char *substr) {
     int res = substrCount(global, substr);
+    _replaceGlobalString(&res);
+    return res;
+}
+
+int startsWith(char *input, char *with) {
+    unsigned long inputLength = strlen(input);
+    unsigned long withLength = strlen(with);
+    if (withLength > inputLength) {
+        return 0;
+    }
+    for (int i = 0; i < withLength; i++) {
+        if (i >= inputLength || input[i] != with[i]) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+int _startsWith(char *with) {
+    int res = startsWith(global, with);
+    _replaceGlobalString(&res);
+    return res;
+}
+
+int endsWith(char *input, char *with) {
+    unsigned long inputLength = strlen(input);
+    unsigned long withLength = strlen(with);
+    if (withLength > inputLength) {
+        return 0;
+    }
+    for (int i = 1; i <= withLength; i++) {
+        if (inputLength - i < 0 || input[inputLength - i] != with[withLength - i]) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+int _endsWith(char *with) {
+    int res = endsWith(global, with);
     _replaceGlobalString(&res);
     return res;
 }
