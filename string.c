@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 // working with files
 
@@ -19,8 +20,11 @@ struct string {
     struct string (*replace)(char *substr, char *with);
     struct string (*removeWhen)(int(*removePredicate)(char a));
     struct string (*trimLeft)();
+    struct string (*trimLeftWith)(char with);
     struct string (*trimRight)();
+    struct string (*trimRightWith)(char with);
     struct string (*trim)();
+    struct string (*trimWith)(char with);
     struct stringarray (*split)(char* by);
 };
 struct string chain(char *input);
@@ -40,10 +44,16 @@ char* removeWhen(char *input, int(*removePredicate)(char a));
 static struct string _removeWhen(int(*removePredicate)(char a));
 char* trimLeft(char *input);
 static struct string _trimLeft();
+char* trimLeftWith(char *input, char with);
+static struct string _trimLeftWith(char with);
 char* trimRight(char *input);
 static struct string _trimRight();
+char* trimRightWith(char *input, char with);
+static struct string _trimRightWith(char with);
 char* trim(char *input);
 static struct string _trim();
+char* trimWith(char *input, char with);
+static struct string _trimWith(char with);
 char** split(char *input, char *by);
 static struct stringarray _split(char* by);
 static void _fillWithParts(char *input, char *substring, char **parts);
@@ -145,8 +155,11 @@ static struct string _createString(char *input) {
         _replace,
         _removeWhen,
         _trimLeft,
+        _trimLeftWith,
         _trimRight,
+        _trimRightWith,
         _trim,
+        _trimWith,
         _split
     };
     return s;
@@ -307,6 +320,21 @@ static struct string _trimLeft() {
     return _createString(res);
 }
 
+char* trimLeftWith(char *input, char with) {
+    unsigned long inputLength = strlen(input);
+    int includeFrom = 0;
+    while (input[includeFrom] == ' ' || input[includeFrom] == '\n' || input[includeFrom] == '\t' || input[includeFrom] == with) {
+        includeFrom++;
+    }
+    return substr(input, includeFrom, inputLength - 1);
+}
+
+static struct string _trimLeftWith(char with) {
+    char *res = trimLeftWith(global, with);
+    _replaceGlobalString(res);
+    return _createString(res);
+}
+
 /// @brief creates a new string with trailing whitespace removed
 /// @param input the string whose trailing whitespace should be removed
 /// @return pointer to the newly created string 
@@ -325,6 +353,21 @@ static struct string _trimRight() {
     return _createString(res);
 }
 
+char* trimRightWith(char *input, char with) {
+    unsigned long inputLength = strlen(input);
+    int includeTil = inputLength - 1;
+    while (input[includeTil] == ' ' || input[includeTil] == '\n' || input[includeTil] == '\t' || input[includeTil] == with) {
+        includeTil--;
+    }
+    return substr(input, 0, includeTil);
+}
+
+static struct string _trimRightWith(char with) {
+    char *res = trimRightWith(global, with);
+    _replaceGlobalString(res);
+    return _createString(res);
+}
+
 /// @brief creates a new string with prededing and trailing whitespace removed
 /// @param input the string whose preceding and trailing whitespace should be removed 
 /// @return pointer to the newly created string 
@@ -337,6 +380,19 @@ char* trim(char *input) {
 
 static struct string _trim() {
     char *res = trim(global);
+    _replaceGlobalString(res);
+    return _createString(res);
+}
+
+char* trimWith(char *input, char with) {
+    char *leftRemoved = trimLeftWith(input, with);
+    char *rightRemoved = trimRightWith(leftRemoved, with);
+    free(leftRemoved);
+    return rightRemoved;
+}
+
+static struct string _trimWith(char with) {
+    char *res = trimWith(global, with);
     _replaceGlobalString(res);
     return _createString(res);
 }
