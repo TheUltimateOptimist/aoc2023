@@ -15,6 +15,7 @@ struct string {
     char *end;
     int (*isEmpty)();
     int (*isEmptyW)();
+    struct string (*strAdd)(char *addition);
     struct string (*substr)(long from, long to);
     int (*substrCount)(char *substr);
     int (*startsWith)(char *with);
@@ -36,6 +37,8 @@ int isEmpty(char *input);
 static int _isEmpty();
 int isEmptyW(char *input);
 static int _isEmptyW();
+char* strAdd(char *input, char *addition);
+static struct string _strAdd(char *addition);
 char* substr(char *input, long from, long to);
 static struct string _substr(long from, long to);
 int substrCount(char *input, char *substr);
@@ -74,6 +77,7 @@ struct stringarray {
 };
 int strarraylen(char **stringArray);
 void strarrayfree(char **stringArray);
+void strarrayprint(char **stringArray);
 static struct stringarray _createStringArray(char **input);
 
 char* join(char **input, char *by);
@@ -136,7 +140,10 @@ struct string readFile(char *fileName) {
         content[i] = fgetc(filePointer);
     }
     content[size] = '\0';
-    return chain(content);
+    fclose(filePointer);
+    shouldConsume = true;
+    global = content;
+    return _createString(content);
 }
 
 
@@ -156,6 +163,7 @@ static struct string _createString(char *input) {
         input,
         _isEmpty,
         _isEmptyW,
+        _strAdd,
         _substr,
         _substrCount,
         _startsWith,
@@ -202,6 +210,27 @@ static int _isEmptyW() {
     int res = isEmptyW(global);
     _replaceGlobalString(&res);
     return res;
+}
+
+char *strAdd(char *input, char *addition) {
+    unsigned long inputLength = strlen(input);
+    unsigned long additionLength = strlen(addition);
+    char *newString = malloc(inputLength + additionLength + 1);
+    int index = 0;
+    for (int i = 0; i < inputLength; i++, index++) {
+        newString[index] = input[i];
+    }
+    for (int i = 0; i < additionLength; i++, index++) {
+        newString[index] = addition[i];
+    }
+    newString[index] = '\0';
+    return newString;
+}
+
+struct string _strAdd(char *addition) {
+    char *res = strAdd(global, addition);
+    _replaceGlobalString(res);
+    return _createString(res);
 }
 
 /// @brief creates a string that goes from input[from] to input[to]  
@@ -540,6 +569,14 @@ static struct stringarray _createStringArray(char **input) {
         _collectLong
     };
     return s;
+}
+
+void strarrayprint(char **stringArray) {
+    printf("[");
+    for (int i = 0; i < strarraylen(stringArray); i++) {
+        printf("'%s'", stringArray[i]);
+    }
+    printf("]\n");
 }
 
 /// @brief joins the given strings in the input with by  
