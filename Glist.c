@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define INITIALSIZE 8
 #define NT i;int
 #define NT u;unsigned int
 #define NT ld;long
@@ -14,8 +13,8 @@ typedef struct Nlist {
 } Nlist;
 
 Nlist NlistCreate() {
-    T *data = malloc(INITIALSIZE*sizeof(T));
-    Nlist new = {.capacity = INITIALSIZE, .length = 0, .data = data};
+    T *data = malloc(8*sizeof(T));
+    Nlist new = {.capacity = 8, .length = 0, .data = data};
     return new;
 }
 
@@ -47,16 +46,3 @@ T NlistGet(Nlist *list, int index) {
     }
     return list->data[index];
 }
-
-// int main() {
-//     intlist list = intlistCreate();
-//     for (int i = 0; i < 1000; i++) {
-//         intlistAdd(&list, i); 
-//     }
-//     int capacity = list.capacity;
-//     while(list.capacity == capacity) {
-//         intlistPop(&list);
-//     }
-//     printf("%d\n", list.length);
-//     printf("%d\n", list.capacity);
-// }
