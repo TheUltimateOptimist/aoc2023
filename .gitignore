@@ -5,3 +5,8 @@
 !.gitignore
 
 test.c
+
+# ignore generics 
+G*/
+
+*gen.c
