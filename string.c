@@ -72,6 +72,7 @@ static void _fillWithParts(char *input, char *substring, char **parts);
 
 struct stringarray {
     char **end;
+    struct string (*get)(int index);
     struct string (*join)(char*);
     long* (*collectLong)(int* length);
 };
@@ -80,6 +81,8 @@ void strarrayfree(char **stringArray);
 void strarrayprint(char **stringArray);
 static struct stringarray _createStringArray(char **input);
 
+char *get(char **input, int index);
+static struct string _get(int index);
 char* join(char **input, char *by);
 static struct string _join(char *by);
 long* collectLong(char **input, int *length);
@@ -307,7 +310,7 @@ int startsWith(char *input, char *with) {
     return 1;
 }
 
-int _startsWith(char *with) {
+static int _startsWith(char *with) {
     int res = startsWith(global, with);
     _replaceGlobalString(&res);
     return res;
@@ -327,7 +330,7 @@ int endsWith(char *input, char *with) {
     return 1;
 }
 
-int _endsWith(char *with) {
+static int _endsWith(char *with) {
     int res = endsWith(global, with);
     _replaceGlobalString(&res);
     return res;
@@ -565,6 +568,7 @@ void strarrayfree(char **stringArray) {
 static struct stringarray _createStringArray(char **input) {
     struct stringarray s = {
         input,
+        _get,
         _join,
         _collectLong
     };
@@ -574,9 +578,26 @@ static struct stringarray _createStringArray(char **input) {
 void strarrayprint(char **stringArray) {
     printf("[");
     for (int i = 0; i < strarraylen(stringArray); i++) {
-        printf("'%s'", stringArray[i]);
+        printf("'%s', ", stringArray[i]);
     }
     printf("]\n");
+}
+
+char* get(char **input, int index) {
+    return input[index];
+}
+
+static struct string _get(int index) {
+    char *res = get(global, index);
+    char **parts = global;
+    for (int i = 0; i < strarraylen(global); i++) {
+        if (i != index) {
+            free(parts[i]);
+        }
+    }
+    free(global);
+    global = res;
+    return _createString(res);
 }
 
 /// @brief joins the given strings in the input with by  
@@ -608,6 +629,7 @@ char* join(char **input, char *by) {
             index++;
         }
     }
+    result[index] = '\0';
     return result;
 }
 
