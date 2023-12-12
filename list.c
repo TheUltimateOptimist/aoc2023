@@ -4,8 +4,6 @@
 #include <math.h>
 #define INITIALSIZE 8
 
-
-
 //list implementation with resizing arrays (insertion with O(1) amortified)
 typedef struct list {
     size_t length;
@@ -64,12 +62,22 @@ void listPrint(list *list, void (*printElement)(void* element)) {
 }
 
 void* listPop(list *list) {
+    if (list->length == 0) {
+        return NULL;
+    }
     if (list->capacity > 8 && list->capacity / list->length == 4) {
         list->capacity = list->capacity / 2;
         list->data = realloc(list->data, list->capacity*list->elementSize);
     }
     list->length--;
     return (char*)list->data + list->length*list->elementSize;
+}
+
+void listClear(list *list) {
+    free(list->data);
+    list->data = malloc(INITIALSIZE*list->elementSize);
+    list->length = 0;
+    list->capacity = INITIALSIZE;
 }
 
 void* listGet(list *list, int index) {
