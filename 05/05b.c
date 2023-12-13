@@ -2,7 +2,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include "../string.c"
-#include "../list.c"
 
 #define MAPS_COUNT 7
 #define SEEDSCOUNT 20
