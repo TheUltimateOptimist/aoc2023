@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include "list.c"
 
 // working with files
 
@@ -74,6 +75,7 @@ struct stringarray {
     char **end;
     struct string (*get)(int index);
     struct string (*join)(char*);
+    list (*collect)(void*(*map)(char *text), size_t elementSize);
     long* (*collectLong)(int* length);
 };
 int strarraylen(char **stringArray);
@@ -85,8 +87,10 @@ char *get(char **input, int index);
 static struct string _get(int index);
 char* join(char **input, char *by);
 static struct string _join(char *by);
+list collect(char **input, void*(*map)(char *text), size_t elementSize);
+static list _collect(void* (*map)(char *text), size_t elementSize);
 long* collectLong(char **input, int *length);
-long* _collectLong(int *length);
+static long* _collectLong(int *length);
 
 
 
@@ -570,6 +574,7 @@ static struct stringarray _createStringArray(char **input) {
         input,
         _get,
         _join,
+        _collect,
         _collectLong
     };
     return s;
@@ -639,6 +644,26 @@ static struct string _join(char *by) {
     return _createString(res);
 }
 
+list collect(char **input, void* (*map)(char *text), size_t elementSize) {
+    list collected = listCreate(elementSize);
+    for (int i = 0; i < strarraylen(input); i++) {
+        void *savedGlobal = global;
+        void* result = map(input[i]);
+        global = savedGlobal;
+        if (result != NULL) {
+            listAdd(&collected, result);
+            free(result);
+        }
+    }
+    return collected;
+}
+
+static list _collect(void* (*map)(char *text), size_t elementSize) {
+    list res = collect(global, map, elementSize);
+    _replaceGlobalStringArray(&res);
+    return res;
+}
+
 long* collectLong(char **input, int *length) {
     int inputLength = strarraylen(input);
     int numberCount = 0;
@@ -662,7 +687,7 @@ long* collectLong(char **input, int *length) {
     return numberList;
 }
 
-long* _collectLong(int *length) {
+static long* _collectLong(int *length) {
     long *res = collectLong(global, length);
     _replaceGlobalStringArray(res);
     return res;
