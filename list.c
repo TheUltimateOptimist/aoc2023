@@ -12,6 +12,17 @@ typedef struct list {
     void *data;
 } list;
 
+static int _parseIndex(list *list, int index) {
+    if (index < 0) {
+        index = list->length + index;
+    }
+    if (index < 0 || index >= list->length) {
+        printf("EXITED: Index %d not in 0..%lu!\n", index, list->length - 1);
+        exit(1);
+    }
+    return index;
+}
+
 list listCreate(size_t elementSize) {
     void *data = malloc(INITIALSIZE*elementSize);
     list new = {.capacity = INITIALSIZE, .length = 0, .data = data, .elementSize = elementSize};
@@ -73,6 +84,10 @@ void* listPop(list *list) {
     return (char*)list->data + list->length*list->elementSize;
 }
 
+void listSet(list *list, int at, void *new) {
+    memcpy((char*)list->data + _parseIndex(list, at) * list->elementSize, new, list->elementSize);
+}
+
 void listClear(list *list) {
     free(list->data);
     list->data = malloc(INITIALSIZE*list->elementSize);
@@ -81,12 +96,5 @@ void listClear(list *list) {
 }
 
 void* listGet(list *list, int index) {
-    if (index < 0) {
-        index = list->length + index;
-    }
-    if (index < 0 || index >= list->length) {
-        printf("EXITED: Index %d not in 0..%lu!\n", index, list->length - 1);
-        exit(1);
-    }
-    return (char*)list->data + index*list->elementSize;
+    return (char*)list->data + _parseIndex(list, index)*list->elementSize;
 }
