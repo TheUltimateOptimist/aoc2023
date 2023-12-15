@@ -17,8 +17,7 @@ static int _parseIndex(list *list, int index) {
         index = list->length + index;
     }
     if (index < 0 || index >= list->length) {
-        printf("EXITED: Index %d not in 0..%lu!\n", index, list->length - 1);
-        exit(1);
+        printf("WARNING: Index %d not in 0..%lu!\n", index, list->length - 1);
     }
     return index;
 }
@@ -61,6 +60,10 @@ void listAdd(list *list, void *new) {
     list->length++;
 }
 
+void listSet(list *list, int at, void *new) {
+    memcpy((char*)list->data + _parseIndex(list, at) * list->elementSize, new, list->elementSize);
+}
+
 void listPrint(list *list, void (*printElement)(void* element)) {
     printf("[");
     for (int i = 0; i < list->length; i++) {
@@ -80,13 +83,33 @@ void* listPop(list *list) {
         list->capacity = list->capacity / 2;
         list->data = realloc(list->data, list->capacity*list->elementSize);
     }
+    void *result = malloc(list->elementSize);
+    memcpy(result, (char*)list->data + list->length*list->elementSize, list->elementSize);
     list->length--;
-    return (char*)list->data + list->length*list->elementSize;
+    return result;
 }
 
-void listSet(list *list, int at, void *new) {
-    memcpy((char*)list->data + _parseIndex(list, at) * list->elementSize, new, list->elementSize);
+void* listPopAt(list *list, int at) {
+    at = _parseIndex(list, at);
+    if (at < 0 || at >= list->length) {
+        return NULL;
+    }
+    if (list->length == 1) {
+        return listPop(list);
+    }
+    if (list->capacity > 8 && list->capacity / list->length == 4) {
+        list->capacity = list->capacity / 2;
+        list->data = realloc(list->data, list->capacity*list->elementSize);
+    }
+    void *result = malloc(list->elementSize);
+    memcpy(result, (char*)list->data + at*list->elementSize, list->elementSize);
+    for (int i = at; i < list->length - 1; i++) {
+            listSet(list, i, (char*)list->data + (i + 1)*list->elementSize);
+    }
+    list->length--;
+    return result;
 }
+
 
 void listClear(list *list) {
     free(list->data);
@@ -96,5 +119,9 @@ void listClear(list *list) {
 }
 
 void* listGet(list *list, int index) {
+    index = _parseIndex(list, index);
+    if (index < 0 || index >= list->length) {
+        return NULL;
+    } 
     return (char*)list->data + _parseIndex(list, index)*list->elementSize;
 }
