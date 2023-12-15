@@ -4,7 +4,7 @@
 #include <math.h>
 #define INITIALSIZE 8
 
-//list implementation with resizing arrays (insertion with O(1) amortified)
+//list implementation with resizing arrays (insertion with O(1) amortized)
 typedef struct list {
     size_t length;
     size_t capacity;
