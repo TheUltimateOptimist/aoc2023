@@ -1,8 +1,9 @@
 # the goal with this is to ignore all executables which i always create starting with a dot
 .**
 
-# but gitignore should not be ignored
+# but gitignore and .vscode should not be ignored
 !.gitignore
+!.vscode
 
 test.c
 
@@ -10,3 +11,5 @@ test.c
 G*/
 
 *gen.c
+
+__pycache__
