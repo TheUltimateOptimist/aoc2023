@@ -28,11 +28,40 @@ class Way:
     col: int
     steps: int
     direction: tuple[int, int]
-    stepped_on: set[tuple[int, int]]
 
 
-ways = [Way(0, 1, 0, direction, set())]
+ways = [Way(0, 1, 0, direction)]
 max_steps = 0
+
+seen = set()
+
+def get_next_directions(row: int, col: int, direction: tuple[int, int]) -> list[tuple[int, int]]:
+    directions: list[tuple[int, int]] = []
+    for new_direction in [(0,1), (0, -1), (1, 0), (-1, 0)]:
+        nrow = new_direction[0] + row
+        ncol = new_direction[1] + col
+        if new_direction != (-direction[0], -direction[1]) and grid[nrow][ncol] != "#" and nrow >= 0 and nrow < len(grid) and ncol >= 0 and ncol < len(grid[0]):
+            directions.append(new_direction)
+    return directions
+
+def dfs(way: Way):
+    if way.row == len(grid) - 1 and way.col == len(grid[0]) - 2:
+        return 0
+    m = -float("inf")
+    seen.add((way.row, way.col))
+    next_directions = get_next_directions()
+    while len(next_directions) == 1:
+        way.
+        
+    for nx in graph[pt]:
+        if nx not in seen:
+            m = max(m, dfs(nx) + graph[pt][nx])
+    seen.remove(pt)
+
+    return m
+
+
+
 
 while len(ways) > 0:
     for i in range(len(ways) - 1, -1, -1):
