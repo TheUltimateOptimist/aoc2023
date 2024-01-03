@@ -17,6 +17,7 @@ struct string {
     int (*isEmpty)();
     int (*isEmptyW)();
     struct string (*strAdd)(char *addition);
+    int (*equals)(char *other);
     struct string (*substr)(long from, long to);
     int (*substrCount)(char *substr);
     int (*startsWith)(char *with);
@@ -40,6 +41,8 @@ int isEmptyW(char *input);
 static int _isEmptyW();
 char* strAdd(char *input, char *addition);
 static struct string _strAdd(char *addition);
+int strEquals(char *this, char *other);
+int _strEquals(char *other);
 char* substr(char *input, long from, long to);
 static struct string _substr(long from, long to);
 int substrCount(char *input, char *substr);
@@ -171,6 +174,7 @@ static struct string _createString(char *input) {
         _isEmpty,
         _isEmptyW,
         _strAdd,
+        _strEquals,
         _substr,
         _substrCount,
         _startsWith,
@@ -238,6 +242,26 @@ struct string _strAdd(char *addition) {
     char *res = strAdd(global, addition);
     _replaceGlobalString(res);
     return _createString(res);
+}
+
+int strEquals(char *this, char *other) {
+    size_t thisLength = strlen(this);
+    size_t otherLength = strlen(other);
+    if (thisLength != otherLength) {
+        return 0;
+    }
+    for (int i = 0; i < thisLength; i++) {
+        if (this[i] != other[i]) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+int _strEquals(char *other) {
+    int res = strEquals(global, other);
+    _replaceGlobalString(&res);
+    return res;
 }
 
 /// @brief creates a string that goes from input[from] to input[to]  
