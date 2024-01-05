@@ -12,6 +12,20 @@
 //TODO: --help
 //TODO: all names descriptions etc should be cloned to avoid dangling pointers
 
+#define ERROR_ADDED_SHORT_DESCRIPTION_TWICE \
+    "pardescribeShort failed with the following Exception:\n"\
+    "Can not add short description twice.\n"\
+    "You tried to add a short description even though it was already added before."
+
+#define ERROR_ADDED_LONG_DESCRIPTION_TWICE \
+    "pardescribeLong failed with the following Exception:\n"\
+    "Can not add long description twice.\n"\
+    "You tried to add a long description even though it was already added before."
+
+#define ERROR_ADDED_SMALLER_TWICE \
+    "parsmaller failed with the following Exception:\n"\
+    "Can not "
+
 typedef struct Constraints {
     double *greater;
     double *smaller;
@@ -19,17 +33,11 @@ typedef struct Constraints {
     double *smallerEquals;
 } Constraints;
 
-typedef struct Info {
+typedef struct FieldInfo {
     char *name;
     char *shortDescription;
     char *longDescription;
-} Info;
-
-typedef union Value {
-    long long int *intValue;
-    double *doubleValue;
-    char *stringValue;
-} Value;
+} FieldInfo;
 
 typedef enum DataType {
     tint,
@@ -37,40 +45,23 @@ typedef enum DataType {
     tstring
 } DataType;
 
+typedef union Value {
+    int *intValue;
+    double *doubleValue;
+    char *stringValue;
+} Value;
+
 typedef struct Parameter {
-    Info info;
+    FieldInfo info;
     Constraints constraints;
     Value value;
     DataType dataType;
 } Parameter;
 
-typedef struct ParameterFinder {
-    PARSER *parser;
-    bool isPositional;
-    int index;
-} ParameterFinder;
-
 typedef struct Flag {
-    Info info;
+    FieldInfo info;
     bool value;
 } Flag;
-
-typedef struct INT {
-    ParameterFinder parameterFinder;
-} INT;
-
-typedef struct DOUBLE {
-    ParameterFinder parameterFinder;
-} DOUBLE;
-
-typedef struct STRING {
-    ParameterFinder parameterFinder;
-} STRING;
-
-typedef struct FLAG {
-    PARSER *parser;
-    int index;
-} FLAG;
 
 typedef struct PARSER {
     char *shortDescription;
@@ -80,6 +71,11 @@ typedef struct PARSER {
     list flags;
     bool hasParsed;
 } PARSER;
+
+void raise(char *exception) {
+    printf("%s\n", exception);
+    exit(1);
+}
 
 PARSER* parget() {
     PARSER *parser = malloc(sizeof(PARSER));
@@ -91,6 +87,71 @@ PARSER* parget() {
     parser->hasParsed = false;
     return parser;
 }
+
+static char* strclone(char *input) {
+    size_t inputLength = strlen(input);
+    char *clone = malloc((inputLength + 1)*sizeof(char));
+    for (int i = 0; i < inputLength; i++) {
+        clone[i] = input[i];
+    }
+    clone[inputLength] = '\0';
+    return clone;
+}
+
+FieldInfo* findFieldInfo(PARSER *parser, void *field) {
+    int id = *((int*)field);
+    switch (id % 3) {
+        case 0: {
+            Flag *flag = listGet(&parser->flags, id / 3);
+            return &flag->info;
+        }
+        case 1: {
+            Parameter *parameter = listGet(&parser->positionalParameters, (id - 1) / 3);
+            return &parameter->info;
+        }
+        case 2: {
+            Parameter *parameter = listGet(&parser->optionalParameters, (id - 2) / 3);
+            return &parameter->info;
+        }
+        default: raise("findFieldInfo: unexpected exception!");
+    }
+}
+
+void pardescribeShort(PARSER *parser, void *field, char *description) {
+    if (field == NULL) {
+        if (parser->shortDescription != NULL) {
+            raise(ERROR_ADDED_SHORT_DESCRIPTION_TWICE);
+        }
+        parser->shortDescription = strclone(description); 
+        return;
+    }
+    FieldInfo *info = findFieldInfo(parser, field);
+    if (info->shortDescription != NULL) {
+        raise(ERROR_ADDED_SHORT_DESCRIPTION_TWICE);
+    }
+    info->shortDescription = strclone(description);
+}
+
+void pardescribeLong(PARSER *parser, void *field, char *description) {
+    if (field == NULL) {
+        if (parser->longDescription != NULL) {
+            raise(ERROR_ADDED_LONG_DESCRIPTION_TWICE);
+        }
+        parser->longDescription = strclone(description); 
+        return;
+    }
+    FieldInfo *info = findFieldInfo(parser, field);
+    if (info->longDescription != NULL) {
+        raise(ERROR_ADDED_LONG_DESCRIPTION_TWICE);
+    }
+    info->longDescription = strclone(description);
+}
+
+void parsmaller(PARSER *parser, void *field, double than) {
+
+}
+
+
 
 void parshortDescription(PARSER *parser, char *description) {
     parser->shortDescription = description;
