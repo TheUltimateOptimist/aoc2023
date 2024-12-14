@@ -1,4 +1,4 @@
-from util import read, Grid, dirs, pair, rotatea, rotatec
+from util import read, Grid, dirs, pair, rotate90, rotate270
 from dataclasses import dataclass
 grid = Grid.from_input(read())
 
@@ -19,9 +19,9 @@ class SideStore:
         c_match: Side | None = None
         for side in self.sides:
             if side.dir == dir:
-                if pos == (side.root + rotatea(side.dir) * side.a):
+                if pos == (side.root + rotate90(side.dir) * side.a):
                     a_match = side
-                elif pos == (side.root + rotatec(side.dir) * side.c):
+                elif pos == (side.root + rotate270(side.dir) * side.c):
                     c_match = side
         if a_match is not None:
             a_match.a += 1

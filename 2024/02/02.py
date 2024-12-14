@@ -1,7 +1,6 @@
 from util import read
 
 data = read().splitlines()
-
 safe_reports = 0
 for level in data:
     level = list(map(lambda x: int(x), level.split(" ")))

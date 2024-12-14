@@ -1,19 +1,17 @@
 from __future__ import annotations
 import sys
+from dataclasses import dataclass
 from typing import Callable
 
-YEAR = "2024"
-
 def read():
-    folderName = sys.argv[0].split("/")[-2]
-    day = str(int(folderName))
-    filePath = f"{YEAR}/{folderName}/test.txt"
+    year = sys.argv[0].split("/")[-3]
+    day = sys.argv[0].split("/")[-2]
+    filePath = f"{year}/{day}/test.txt"
     if (len(sys.argv) <= 1):
-        filePath = f"{YEAR}/{folderName}/input.txt"
+        filePath = f"{year}/{day}/input.txt"
     with open(filePath, "r", encoding="ascii") as file:
-        return file.read().strip()
+        return '\n'.join(map(lambda t: t.strip(), file.read().strip().splitlines()))
 
-from dataclasses import dataclass
 
 def to_lines(points: list[tuple[int, int]]) -> list[tuple[int, int]]:
     if points[0] != points[-1]:
@@ -131,11 +129,11 @@ class Grid[T]:
             output += '\n'
         return output[:-1]
 
-    def find(self, element: T) -> tuple[int, int] | None:
+    def find(self, element: T) -> pair | None:
         for row in range(len(self.data)):
             for col in range(len(self.data[0])):
                 if self.data[row][col] == element:
-                    return (row, col)
+                    return pair(row, col)
         return None
 
     def count(self, element: T) -> int:
@@ -176,7 +174,7 @@ class Grid[T]:
         for _ in range(3):
             start = start + direction
             if start in self and (filter == None or filter(self[start])): result.append(start)
-            direction = rotatea(direction)
+            direction = rotate90(direction)
         return result
 
     @classmethod
@@ -204,20 +202,20 @@ class Grid[T]:
         )
         return (pos, value)
 
-def rotatea(dir: pair) -> pair:
+def rotate90(dir: pair) -> pair:
     '''
     Returns a new Direction object rotated by 90 degrees clockwise.
     '''
-    return pair(-dir.c, dir.r)
+    return pair(dir.c, -dir.r)
 
-def rotateb(dir: pair) -> pair:
+def rotate180(dir: pair) -> pair:
     '''
     Returns a new Direction object rotated by 180 degrees clockwise.
     '''
     return pair(-dir.r, -dir.c)
 
-def rotatec(dir: pair) -> pair:
+def rotate270(dir: pair) -> pair:
     '''
     Returns a new Direction Object rotated by 270 degrees clockwise.
     '''
-    return pair(dir.c, -dir.r)
+    return pair(-dir.c, dir.r)
