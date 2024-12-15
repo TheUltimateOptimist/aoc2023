@@ -25,7 +25,7 @@ for game in games:
     mintokens = 100_000
     for a in range(101):
         for b in range(101):
-            if a*game.a.r + b*game.b.r == game.p.r and a*game.a.c + b*game.b.c == game.p.c and (a*3 + b) < mintokens:
+            if a*game.a.a + b*game.b.a == game.p.a and a*game.a.b + b*game.b.b == game.p.b and (a*3 + b) < mintokens:
                 mintokens = a*3 + b
     if mintokens < 100_000:
         tokens += mintokens

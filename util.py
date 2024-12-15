@@ -71,17 +71,17 @@ def analyze_polygon(edges: list[tuple[int, int]]) -> PolygonInfo:
 
 @dataclass(frozen=True)
 class pair:
-    r: int
-    c: int
+    a: int
+    b: int
 
     def __add__(self, other) -> pair:
-        return pair(self.r + other.r, self.c + other.c)
+        return pair(self.a + other.r, self.b + other.c)
 
     def __sub__(self, other) -> pair:
-        return pair(self.r - other.r, self.c - other.c)
+        return pair(self.a - other.r, self.b - other.c)
 
     def __mul__(self, other: int) -> pair:
-        return pair(self.r*other, self.c*other)
+        return pair(self.a*other, self.b*other)
 
 class dirs:
     none = pair(0, 0)
@@ -118,7 +118,7 @@ class Grid[T]:
 
     def __contains__(self, item) -> bool:
         if isinstance(item, pair):
-            return item.r >= 0 and item.c >= 0 and item.r < self.numrows and item.c < self.numcols
+            return item.a >= 0 and item.b >= 0 and item.a < self.numrows and item.b < self.numcols
         return item in self.data
 
     def __str__(self) -> str:
@@ -182,10 +182,10 @@ class Grid[T]:
         return Grid(list(map(lambda x: list(x), input.strip().splitlines())))
 
     def __setitem__(self, at: pair, val: T) -> None:
-        self.data[at.r][at.c] = val
+        self.data[at.a][at.b] = val
 
     def __getitem__(self, at: pair) -> T:
-        return self.data[at.r][at.c]
+        return self.data[at.a][at.b]
 
     def __iter__(self) -> 'Grid[T]':
         self._at = pair(0, 0)
@@ -197,8 +197,8 @@ class Grid[T]:
         value = self[self._at]
         pos = self._at
         self._at = pair(
-            self._at.r + 1 if self._at.c >= self.numcols - 1 else self._at.r,
-            self._at.c + 1 if self._at.c < self.numcols - 1 else 0
+            self._at.a + 1 if self._at.b >= self.numcols - 1 else self._at.a,
+            self._at.b + 1 if self._at.b < self.numcols - 1 else 0
         )
         return (pos, value)
 
@@ -206,16 +206,17 @@ def rotate90(dir: pair) -> pair:
     '''
     Returns a new Direction object rotated by 90 degrees clockwise.
     '''
-    return pair(dir.c, -dir.r)
+    return pair(dir.b, -dir.a)
 
 def rotate180(dir: pair) -> pair:
     '''
     Returns a new Direction object rotated by 180 degrees clockwise.
     '''
-    return pair(-dir.r, -dir.c)
+    return pair(-dir.a, -dir.b)
 
 def rotate270(dir: pair) -> pair:
     '''
     Returns a new Direction Object rotated by 270 degrees clockwise.
     '''
-    return pair(-dir.c, dir.r)
+    return pair(-dir.b, dir.a)
+

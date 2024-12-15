@@ -40,14 +40,14 @@ for i in range(10000):
     for pos, velocities in robots.items():
         for vel in velocities:
             new_pos = pos + vel 
-            if new_pos.r < 0:
-                new_pos = pair(new_pos.r + x, new_pos.c)
-            elif new_pos.r >= x:
-                new_pos = pair(new_pos.r - x, new_pos.c)
-            if new_pos.c < 0:
-                new_pos = pair(new_pos.r, new_pos.c + y)
-            elif new_pos.c >= y:
-                new_pos = pair(new_pos.r, new_pos.c - y)
+            if new_pos.a < 0:
+                new_pos = pair(new_pos.a + x, new_pos.b)
+            elif new_pos.a >= x:
+                new_pos = pair(new_pos.a - x, new_pos.b)
+            if new_pos.b < 0:
+                new_pos = pair(new_pos.a, new_pos.b + y)
+            elif new_pos.b >= y:
+                new_pos = pair(new_pos.a, new_pos.b - y)
             if new_robots.get(new_pos) is None:
                 new_robots[new_pos] = [vel]
             else: new_robots[new_pos].append(vel)

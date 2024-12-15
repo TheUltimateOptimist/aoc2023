@@ -9,7 +9,7 @@ def get_data(start: pair) -> tuple[int, int, int]:
     for corner in corners.all:
         neighbours = grid.get_by_corner(start, corner, lambda x: x.endswith(char))
         if len(neighbours) == 1: corners1 += 1
-        if len(neighbours) == 2 and neighbours[0].r != neighbours[1].r and neighbours[0].c != neighbours[1].c: corners1 += 1
+        if len(neighbours) == 2 and neighbours[0].a != neighbours[1].a and neighbours[0].b != neighbours[1].b: corners1 += 1
         if len(neighbours) == 3: corners3 += 1
     for dir in dirs.straight:
         if (start + dir) in grid and grid[start + dir] == char:

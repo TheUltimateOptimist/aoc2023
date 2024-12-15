@@ -27,8 +27,8 @@ def gcd2r(a: tuple[int, int], b: tuple[int, int]):
 
 tokens =int(0)
 for game in games:
-    ax, ay, bx, by = game.a.r, game.a.c, game.b.r, game.b.c
-    px, py = game.p.r + 10000000000000, game.p.c + 10000000000000
+    ax, ay, bx, by = game.a.a, game.a.b, game.b.a, game.b.b
+    px, py = game.p.a + 10000000000000, game.p.b + 10000000000000
     x = (by*px - bx*py) / (ax*by - ay*bx)
     y = (px - x*ax) / bx
     if x % 1 == y % 1 == 0:
