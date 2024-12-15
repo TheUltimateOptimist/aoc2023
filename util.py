@@ -220,3 +220,20 @@ def rotate270(dir: pair) -> pair:
     '''
     return pair(-dir.b, dir.a)
 
+def join(ranges: list[pair]) -> list[pair]:
+    new_ranges: list[pair] = []
+    ranges.sort(key=lambda p: p.a)
+    new_ranges.append(ranges[0])
+    for range in ranges[1:]:
+        next = new_ranges[-1].b + 1
+        if range.a > next:
+            new_ranges.append(range)
+        elif range.a <= next and range.b > new_ranges[-1].b:
+            new_ranges.append(pair(new_ranges.pop().a, range.b))
+    return new_ranges
+
+def numbers(text: str) -> list[int]:
+    import re
+    pattern = r"-?\d+"
+    results = re.findall(pattern, text)
+    return list(map(lambda x: int(x), results))
