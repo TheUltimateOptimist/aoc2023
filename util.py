@@ -1,7 +1,7 @@
 from __future__ import annotations
 import sys
 from dataclasses import dataclass
-from typing import Callable
+from typing import Callable, Iterable
 
 def read():
     year = sys.argv[0].split("/")[-3]
@@ -75,10 +75,10 @@ class pair:
     b: int
 
     def __add__(self, other) -> pair:
-        return pair(self.a + other.r, self.b + other.c)
+        return pair(self.a + other.a, self.b + other.b)
 
     def __sub__(self, other) -> pair:
-        return pair(self.a - other.r, self.b - other.c)
+        return pair(self.a - other.a, self.b - other.b)
 
     def __mul__(self, other: int) -> pair:
         return pair(self.a*other, self.b*other)
@@ -237,3 +237,50 @@ def numbers(text: str) -> list[int]:
     pattern = r"-?\d+"
     results = re.findall(pattern, text)
     return list(map(lambda x: int(x), results))
+
+class DataNumber[T]:
+    def __init__(self, instances: list[T]):
+        self.instances = instances
+        self.value = 1
+        self.length = 0
+
+    def __len__(self) -> int:
+        return self.length
+
+    def append(self, object: T) -> DataNumber[T]:
+        self.value  = self.value * len(self.instances) + self.instances.index(object)
+        self.length += 1
+        return self
+
+    def extend(self, objects: Iterable[T]) -> DataNumber[T]:
+        for object in objects:
+            self.append(object)
+        return self
+
+    def pop(self) -> T:
+        if self.length == 0: raise IndexError
+        index = self.value % len(self.instances)
+        self.value = self.value // len(self.instances)
+        self.length -= 1
+        return self.instances[index]
+
+    def copy(self) -> DataNumber[T]:
+        obj = DataNumber(self.instances)
+        obj.value = self.value
+        obj.length = self.length
+        return obj
+
+    def forward(self) -> DataNumberIterator[T]:
+        return DataNumberIterator(self.copy())
+
+    def __iter__(self) -> DataNumberIterator[T]:
+        return DataNumberIterator(self.copy())
+
+class DataNumberIterator[T]:
+    def __init__(self, data_number: DataNumber[T]) -> None:
+        self.data_number = data_number
+
+    def __next__(self):
+        if self.data_number.length == 0:
+            raise StopIteration
+        return self.data_number.pop()

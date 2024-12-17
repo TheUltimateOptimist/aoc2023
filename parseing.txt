@@ -1,0 +1,24 @@
+1.
+line[object[number, number]]
+
+2.
+line[list[number]] 
+
+3.
+string
+
+4. 
+grid[string]
+
+5.
+line[object[number, number]]
+line[list[number]]
+
+7. 
+line[object[number, list[number]]]
+
+10.
+grid[number]
+
+11.
+list[number]
