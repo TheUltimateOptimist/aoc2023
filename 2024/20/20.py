@@ -1,57 +1,43 @@
 from util import read, dirs, Grid, pair
 
-grid = Grid.from_input(read())
+root_grid = Grid.from_input(read())
+start = root_grid.find('S')
+end = root_grid.find('E')
+assert start is not None
 
-start = grid.find('S')
-end = grid.find('E')
+grid = Grid([[-1 for i in range(root_grid.numcols)] for _ in range(root_grid.numrows)])
+pos = start
+count = 0
+grid[pos] = 0
+while pos != end:
+    count += 1
+    for dir in dirs.straight:
+        if (pos + dir) not in grid: continue
+        if root_grid[pos + dir] == '#': continue
+        if grid[pos + dir] >  -1: continue
+        grid[pos + dir] = count
+        pos = pos + dir
+        break
 
-def get_fastest_without_cheating() -> int:
-    assert start is not None
-    paths: list[tuple[pair, int]] = [(start, 0)]
-    visited: dict[pair, int] = dict()
-    visited[start] = 0
-    while len(paths) > 0:
-        new_paths: list[tuple[pair, int]] = []
-        for path, cost in paths:
-            if path == end:
-                return cost
-            for dir in dirs.straight:
-                if path + dir in grid and grid[path + dir] != '#' and ((path + dir) not in visited.keys() or  visited[path + dir] > cost + 1):
-                    new_paths.append((path + dir, cost + 1))
-                    visited[path + dir] = cost + 1
-        paths = new_paths
-    raise Exception("Unreachable")
+import time
+st = time.time()
 
-fastest = get_fastest_without_cheating()
+pos = start
+cheats = 0
+while pos != end:
+    next = pair(0, 0)
+    for dir in dirs.straight:
+        if (pos + dir) not in grid: continue
+        if grid[pos + dir] == grid[pos] + 1:
+            next = pos + dir
+        if (pos + dir*2) not in grid: continue
+        if grid[pos + dir*2] - grid[pos] >= 102:
+            cheats += 1
+    pos = next
 
-def get_cheats_more_100() -> int:
-    count = 0
-    assert start is not None
-    paths: list[tuple[pair, int, pair | None]] = [(start, 0, None)]
-    visited: set[tuple[pair, pair | None]] = set() 
-    visited.add((start, None))
-    while len(paths) > 0:
-        new_paths: list[tuple[pair, int, pair | None]] = []
-        for path, cost, cheat in paths:
-            print(cost)
-            if path == end:
-                if cheat is not None:
-                    count += 1
-                continue
-            if cost >= fastest - 1 - 99: continue
-            for dir in dirs.straight:
-                if path + dir not in grid: continue
-                if grid[path + dir] == '#' and cheat is not None: continue
-                if (path + dir, cheat) in visited: continue
-                if grid[path + dir] == '#' and cheat is None:
-                    new_paths.append((path + dir, cost + 1, path + dir))
-                elif grid[path + dir] != '#' and (path + dir, cheat) not in visited: 
-                    new_paths.append((path + dir, cost + 1, cheat))
-                    visited.add((path + dir, cheat))
-        paths = new_paths
-    return count
-
-print(get_cheats_more_100())
+et = time.time()
+print((et - st)*1000)
+print(cheats)
 
 
 
