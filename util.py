@@ -83,6 +83,14 @@ class pair:
     def __mul__(self, other: int) -> pair:
         return pair(self.a*other, self.b*other)
 
+    def manhattan(self, other: pair) -> int:
+        return abs(self.a - other.a) + abs(self.b - other.b)
+
+    def dirs(self) -> tuple[pair, pair]:
+        r = pair(-1 if self.a < 0 else int(self.a > 0), 0) 
+        c = pair(0, -1 if self.b < 0 else int(self.b > 0))
+        return (r, c)
+
 class dirs:
     none = pair(0, 0)
     up = pair(-1, 0)
@@ -109,6 +117,22 @@ class corners:
 
     all = [lup, rup, rdown, ldown]
 
+class GridIterator[T]:
+    def __init__(self, grid: Grid[T]) -> None:
+        self.grid = grid
+        self._at = pair(0, 0)
+
+    def __next__(self) -> tuple[pair, T]:
+        if not self._at in self.grid:
+            raise StopIteration
+        value = self.grid[self._at]
+        pos = self._at
+        self._at = pair(
+            self._at.a + 1 if self._at.b >= self.grid.numcols - 1 else self._at.a,
+            self._at.b + 1 if self._at.b < self.grid.numcols - 1 else 0
+        )
+        return (pos, value) 
+
 class Grid[T]:
     def __init__(self, data: list[list[T]]) -> None:
         self.data = data
@@ -129,12 +153,12 @@ class Grid[T]:
             output += '\n'
         return output[:-1]
 
-    def find(self, element: T) -> pair | None:
+    def find(self, element: T) -> pair:
         for row in range(len(self.data)):
             for col in range(len(self.data[0])):
                 if self.data[row][col] == element:
                     return pair(row, col)
-        return None
+        raise ValueError(f"Value {element} is not present in Grid.")
 
     def count(self, element: T) -> int:
         count = 0
@@ -187,20 +211,10 @@ class Grid[T]:
     def __getitem__(self, at: pair) -> T:
         return self.data[at.a][at.b]
 
-    def __iter__(self) -> 'Grid[T]':
-        self._at = pair(0, 0)
-        return self
+    def __iter__(self) -> 'GridIterator[T]':
+        return GridIterator[T](self)
 
-    def __next__(self) -> tuple[pair, T]:
-        if not self._at in self:
-            raise StopIteration
-        value = self[self._at]
-        pos = self._at
-        self._at = pair(
-            self._at.a + 1 if self._at.b >= self.numcols - 1 else self._at.a,
-            self._at.b + 1 if self._at.b < self.numcols - 1 else 0
-        )
-        return (pos, value)
+    
 
 def rotate90(dir: pair) -> pair:
     '''
