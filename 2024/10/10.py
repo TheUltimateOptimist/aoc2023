@@ -1,26 +1,21 @@
-from util import read
+from util import read, Grid, pair, dirs
 
-grid = read().splitlines()
+grid = Grid.from_input(read())
 
-def find_destinations(r: int, c: int, destinations: set[tuple[int, int]]) -> None:
-    for (dr, dc) in [(-1, 0), (0, 1), (1, 0), (0, -1)]:
-        rnew = r + dr
-        cnew = c + dc
-        if rnew >= 0 and cnew >= 0 and rnew < len(grid) and cnew < len(grid[0]):
-            if grid[r][c] == str(int(grid[rnew][cnew]) - 1):
-                if grid[rnew][cnew] == '9':
-                    destinations.append((rnew, cnew))
-                else:
-                    find_destinations(rnew, cnew, destinations)
+def find_destinations(pos: pair, destinations: set[pair]) -> None:
+    for dir in dirs.straight:
+        if pos + dir in grid and int(grid[pos]) == int(grid[pos + dir]) - 1:
+            if grid[pos + dir] == '9':
+                destinations.add(pos + dir)
+            else:
+                find_destinations(pos + dir, destinations)
 
-sum: int = 0
-for r in range(len(grid)):
-    for c in range(len(grid[0])):
-        if grid[r][c] == '0':
-            destinations: list[tuple[int, int]] = list() 
-            find_destinations(r, c, destinations)
-            print(destinations)
-            sum += len(destinations)
+sum = 0
+for pos, value in grid:
+    if value != '0': continue
+    destinations: set[pair] = set()
+    find_destinations(pos, destinations)
+    sum += len(destinations)
 
 print(sum)
 
