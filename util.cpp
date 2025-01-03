@@ -40,3 +40,33 @@ string read(int year, int day, int argc) {
     getline(file, input, '\0');
     return input;
 }
+
+template <typename T>
+permutations<T>::permutations(vector<T>& data) : data(data), index(0) {
+    perm_count = 1;
+    for (int i = 2; i <= data.size(); i++) {
+        perm_count *= i;
+    }
+}
+
+template <typename T>
+permutations<T> permutations<T>::begin() {
+    return this;
+}
+
+template <typename T>
+permutations<T> permutations<T>::end() {
+    this.index = perm_count;
+    return this;
+}
+
+template <typename T>
+vector<T> permutations<T>::operator*()
+{
+    vector<T> permutation = data;
+    size_t total = perm_count;
+    for (int i = 0; i < permutation.size(); i++) {
+        size_t with = index / (total / (permutation.size() - i))
+    }
+
+}
