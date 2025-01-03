@@ -9,16 +9,18 @@ std::string read(int year, int day, int argc);
 template <typename T>
 class permutations {
 public:
-    permutations<T>(std::vector<T>& data);
+    permutations<T>(const std::vector<T>& data);
     permutations<T> begin();
     permutations<T> end();
-    std::vector<T> operator*();
+    std::vector<T> operator[](size_t index);
     bool operator!=(const permutations<T>& other);
+    std::vector<T> operator*();
     permutations<T>& operator++();
 private:
     size_t index;
     size_t perm_count;
-    std::vector<T>& data;
-    void populate_permutation(std::vector<T>& perm, size_t remaining);
+    const std::vector<T>& data;
 };
+#include "util.tcc"
+
 #endif
