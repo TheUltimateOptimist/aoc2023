@@ -38,3 +38,36 @@ string read(int year, int day, int argc) {
     getline(file, input, '\0');
     return input;
 }
+
+coords::coords(int a, int b) : a(a), b(b){}
+bool coords::operator==(const coords& other) {
+    return other.a == a && other.b == b;
+}
+bool coords::operator!=(const coords& other) {
+    return *this == other;
+}
+int coords::operator[](size_t index) {
+    if (index < 0 || index > 1) {
+        throw std::out_of_range("");
+    }
+    return index == 0 ? a : b;
+}
+bool coords::in(const coords& other) {
+    return a >= 0 && b >= 0 and a < other.a && b < other.b;
+}
+
+coords dirs::none = coords(0, 0);
+coords dirs::up = coords(-1, 0);
+coords dirs::right = coords(0, 1);
+coords dirs::down = coords(1, 0);
+coords dirs::left = coords(0, -1);
+coords dirs::lup = coords(-1, -1);
+coords dirs::rup = coords(-1, 1);
+coords dirs::ldown = coords(1, -1);
+coords dirs::rdown = coords(1, 1);
+vector<coords> dirs::diagonal = vector<coords>{dirs::lup, dirs::rup, dirs::rdown, dirs::ldown};
+vector<coords> dirs::straight = vector<coords>{dirs::up, dirs::right, dirs::down, dirs::left};
+vector<coords> dirs::diagonaln = vector<coords>{dirs::none, dirs::lup, dirs::rup, dirs::rdown, dirs::ldown};
+vector<coords> dirs::straightn = vector<coords>{dirs::none, dirs::up, dirs::right, dirs::down, dirs::left};
+vector<coords> dirs::all = vector<coords>{dirs::up, dirs::rup, dirs::right, dirs::rdown, dirs::down, dirs::ldown, dirs::left, dirs::lup};
+vector<coords> dirs::alln = vector<coords>{dirs::none, dirs::up, dirs::rup, dirs::right, dirs::rdown, dirs::down, dirs::ldown, dirs::left, dirs::lup};
